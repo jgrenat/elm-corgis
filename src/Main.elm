@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import FetchDog exposing (defaultCorgi)
+import FetchDog exposing (defaultCorgi, defaultDalmatian, fetchDog)
 import Html exposing (Html, button, div, h1, img, text)
 import Html.Attributes exposing (alt, src, style)
 import Html.Events exposing (onClick)
@@ -18,27 +18,31 @@ main =
 
 
 type alias Model =
-    { breed : String
+    { dog : String
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { breed = "corgi"
+    ( { dog = defaultCorgi
       }
     , Cmd.none
     )
 
 
 type Msg
-    = NoOp
+    = FetchDog String
+    | DogFetched String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
+        FetchDog breed ->
+            ( model, fetchDog breed DogFetched )
+
+        DogFetched url ->
+            ( { model | dog = url }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -46,11 +50,11 @@ view model =
     div [ style "text-align" "center" ]
         [ h1 [] [ text "Des chiens !" ]
         , div []
-            [ img [ src defaultCorgi, alt "Cute dog", style "max-width" "800px" ] []
+            [ img [ src model.dog, alt "Cute dog", style "max-width" "800px" ] []
             ]
         , div []
-            [ button [ onClick NoOp ] [ text "Voir un Corgi" ]
+            [ button [ onClick (FetchDog "corgi/cardigan") ] [ text "Voir un Corgi" ]
             , text " "
-            , button [ onClick NoOp ] [ text "Voir un Dalmatien" ]
+            , button [ onClick (FetchDog "dalmatian") ] [ text "Voir un Dalmatien" ]
             ]
         ]
